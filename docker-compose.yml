@@ -1,8 +1,24 @@
 version: "3.8"
 
 services:
-  app:
-    build: .
-    container_name: codepix-app
-    volumes:
-      - ./:/go/src
+    app:
+        build: .
+        container_name: codepix-app
+        volumes:
+            - ./:/go/src
+
+    db:
+        image: postgres:14.2-alpine
+        container_name: codepix-db
+        restart: always
+        tty: true
+        volumes:
+            - .docker/postgres/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+            - .docker/dbdata:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=docker
+        ports:
+            - "5432:5432"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
